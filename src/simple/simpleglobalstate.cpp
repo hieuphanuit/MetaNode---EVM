@@ -27,6 +27,13 @@ namespace eevm
     return get(addr);
   }
 
+  AccountState SimpleGlobalState::create_with_storage(
+    const Address& addr, const uint256_t& balance, const Code& code, const nlohmann::json& j)
+  {
+    insert({SimpleAccount(addr, balance, code), {SimpleStorage(j)}});
+    return get(addr);
+  }
+
   bool SimpleGlobalState::exists(const Address& addr)
   {
     return accounts.find(addr) != accounts.end();

@@ -30,6 +30,8 @@ namespace eevm
 
     friend void to_json(nlohmann::json&, const SimpleStorage&);
     friend void from_json(const nlohmann::json&, SimpleStorage&);
+
+    nlohmann::json get_storage() override;
   };
 
   void to_json(nlohmann::json& j, const SimpleStorage& s);

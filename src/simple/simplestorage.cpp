@@ -73,4 +73,13 @@ namespace eevm
     os << nlohmann::json(s).dump(2);
     return os;
   }
+
+  nlohmann::json SimpleStorage::get_storage() {
+    nlohmann::json j = nlohmann::json::object();
+    for (const auto& p : s)
+    {
+      j[to_hex_string(p.first)] = to_hex_string(p.second);
+    }
+    return  j;
+  } 
 } // namespace eevm

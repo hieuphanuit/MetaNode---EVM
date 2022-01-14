@@ -52,6 +52,10 @@ namespace eevm
     code = c;
   }
 
+  uint256_t SimpleAccount::get_last_hash() const{ 
+    return last_hash;
+  } 
+
   bool SimpleAccount::has_code()
   {
     return !get_code().empty();

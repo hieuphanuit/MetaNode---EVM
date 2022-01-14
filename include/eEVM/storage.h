@@ -16,6 +16,8 @@ namespace eevm
     virtual void store(const uint256_t& key, const uint256_t& value) = 0;
     virtual uint256_t load(const uint256_t& key) = 0;
     virtual bool remove(const uint256_t& key) = 0;
+    // virtual nlohmann::json get_all_json() = 0;
+    virtual nlohmann::json get_storage() = 0;
     virtual ~Storage() {}
   };
 } // namespace eevm

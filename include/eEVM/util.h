@@ -185,5 +185,7 @@ namespace eevm
 
   Address generate_address(const Address& sender, uint64_t nonce);
 
+  Address generate_contract_address(const Address& sender, uint256_t sender_last_hash);
+  
   uint64_t to_uint64(const std::string& s);
 } // namespace eevm

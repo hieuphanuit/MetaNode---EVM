@@ -31,6 +31,9 @@ namespace eevm
     AccountState get(const Address& addr) override;
     AccountState create(
       const Address& addr, const uint256_t& balance, const Code& code) override;
+    AccountState create_with_storage(
+      const Address& addr, const uint256_t& balance, const Code& code, const nlohmann::json& j) override;
+      
 
     bool exists(const Address& addr);
     size_t num_accounts();

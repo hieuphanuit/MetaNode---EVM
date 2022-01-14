@@ -75,35 +75,6 @@ target_link_libraries(eevm
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Executables
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-add_executable(eevm_tests
-  tests/main.cpp
-  tests/harness.cpp
-  tests/rlp.cpp
-  ${EEVM_SIMPLE_SRCS}
-)
-target_include_directories(eevm_tests PRIVATE
-  ${EEVM_INCLUDE_DIRS}
-)
-target_compile_options(eevm_tests PRIVATE ${COVERAGE_FLAGS})
-target_link_libraries(eevm_tests eevm ${PLATFORM_SPECIFIC_TEST_LIBS})
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Tests
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-enable_testing()
-
-add_test(
-  NAME eevm_tests
-  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/unit_test_wrapper.sh eevm_tests
-)
-
-if(NOT ENV{TEST_DIR}) 
-  set_tests_properties(eevm_tests
-    PROPERTIES
-      ENVIRONMENT TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/test_cases
-  )
-endif()
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -120,7 +91,8 @@ function(add_sample name)
   target_link_libraries(${name} eevm)
 endfunction()
 
-add_sample(hello_world)
-add_sample(sum)
-add_sample(erc20)
-add_sample(disassembler)
+# add_sample(hello_world)
+# add_sample(sum)
+# add_sample(erc20)
+# add_sample(disassembler)
+add_sample(my_erc)

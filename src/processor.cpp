@@ -1228,8 +1228,7 @@ namespace eevm
       const auto size = ctxt->s.pop64();
       auto initCode = copy_from_mem(offset, size);
 
-      const auto newAddress =
-        generate_address(ctxt->acc.get_address(), ctxt->acc.get_nonce());
+      Address newAddress = generate_contract_address(ctxt->acc.get_address(), ctxt->acc.get_last_hash());
 
       // For contract accounts, the nonce counts the number of
       // contract-creations by this account

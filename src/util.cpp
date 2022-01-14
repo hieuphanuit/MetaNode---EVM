@@ -56,4 +56,19 @@ namespace eevm
 
     return from_big_endian(buffer + 12u, 20u);
   }
+
+  Address generate_contract_address(const Address& sender, uint256_t sender_last_hash)
+  {
+    uint8_t byte_data [52u] = {};
+    std::memcpy(byte_data, &sender, 20);
+    std::memcpy(byte_data+sizeof(&sender), &sender_last_hash, 32);
+    
+    uint8_t buffer[32u] = {};
+    keccak_256(
+      (unsigned char* )byte_data,
+      static_cast<unsigned int>(sizeof(byte_data)),
+      buffer);
+
+    return from_big_endian(buffer + 12u, 20u);
+  }
 } // namespace eevm

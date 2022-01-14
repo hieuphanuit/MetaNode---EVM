@@ -68,5 +68,7 @@ namespace eevm
     {
       return !get_code().empty();
     }
+
+    virtual uint256_t get_last_hash() const = 0;
   };
 } // namespace evm

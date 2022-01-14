@@ -43,6 +43,8 @@ namespace eevm
     virtual AccountState get(const Address& addr) = 0;
     virtual AccountState create(
       const Address& addr, const uint256_t& balance, const Code& code) = 0;
+    virtual AccountState create_with_storage(
+      const Address& addr, const uint256_t& balance, const Code& code, const nlohmann::json& j) = 0;
 
     virtual const Block& get_current_block() = 0;
     virtual uint256_t get_block_hash(uint8_t offset) = 0;

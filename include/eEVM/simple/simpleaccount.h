@@ -19,6 +19,7 @@ namespace eevm
     uint256_t balance = {};
     Code code = {};
     Nonce nonce = {};
+    uint256_t last_hash = {};
 
   public:
     SimpleAccount() = default;
@@ -38,6 +39,14 @@ namespace eevm
       nonce(n)
     {}
 
+     SimpleAccount(
+      const Address& a, const uint256_t& b, const Code& c, const uint256_t& last_hash) :
+      address(a),
+      balance(b),
+      code(c),
+      last_hash(last_hash)
+    {}
+
     virtual Address get_address() const override;
     void set_address(const Address& a);
 
@@ -53,6 +62,8 @@ namespace eevm
     virtual bool has_code() override;
 
     bool operator==(const Account&) const;
+
+    virtual uint256_t get_last_hash() const override;
 
     friend void to_json(nlohmann::json&, const SimpleAccount&);
     friend void from_json(const nlohmann::json&, SimpleAccount&);
