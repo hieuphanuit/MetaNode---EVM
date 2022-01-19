@@ -71,4 +71,11 @@ namespace eevm
 
     return from_big_endian(buffer + 12u, 20u);
   }
+
+  void print_hex(uint8_t *s, size_t len) {
+      for(size_t i = 0; i < len; i++) {
+          printf("%02x", s[i]);
+      }
+      printf("\n");
+  }
 } // namespace eevm

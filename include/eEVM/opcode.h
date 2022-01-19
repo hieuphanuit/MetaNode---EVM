@@ -57,7 +57,7 @@ namespace eevm
     GASPRICE       = 0x3a, //  Get price of gas in current environment. (This is gas price specified by the originating transaction.)
     EXTCODESIZE    = 0x3b, // Get size of an account’s code.
     EXTCODECOPY    = 0x3c, // Copy an account’s code to memory
-    // RETURNDATASIZE = 0x3d, // Get size of output data from the previous call from the current environment.
+    RETURNDATASIZE = 0x3d, // Get size of output data from the previous call from the current environment.
     // RETURNDATACOPY = 0x3e, // Copy output data from the previous call to memory.
 
     // 40s: Block Information

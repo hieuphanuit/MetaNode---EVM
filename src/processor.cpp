@@ -164,6 +164,8 @@ namespace eevm
     vector<unique_ptr<Context>> ctxts;
     /// pointer to the current context
     Context* ctxt;
+    
+    vector<uint8_t> returnData; // Last CALL's return data for subsequent reuse
 
     using ET = Exception::Type;
 
@@ -222,8 +224,9 @@ namespace eevm
       }
 
       // halt outer context if it did not do so itself
-      if (ctxt)
+      if (ctxt) {
         stop();
+      }
 
       // clean-up
       for (const auto& addr : tx.selfdestruct_list)
@@ -396,6 +399,9 @@ namespace eevm
     void dispatch()
     {
       const auto op = get_op();
+      cout << "EXECUTE OPCODE ";
+      printf("%02x", op);
+      cout << endl;
       if (tr) // TODO: remove if from critical path
         tr->add(ctxt->get_pc(), op, get_call_depth(), ctxt->s);
 
@@ -657,6 +663,12 @@ namespace eevm
         case Opcode::STOP:
           stop();
           break;
+
+        // << MYCODE
+        case Opcode::RETURNDATASIZE:
+          opReturnDataSize();
+          break;
+        //>>
         default:
           stringstream err;
           err << fmt::format(
@@ -1018,7 +1030,25 @@ namespace eevm
 
     void extcodesize()
     {
-      ctxt->s.push(gs.get(pop_addr(ctxt->s)).acc.get_code().size());
+      //<< MYCODE
+      // TODO: call to android or ios to get code relate to smart contract or code do fetch
+      auto deployed_code = to_bytes("608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806312065fe01461005c5780633ccfd60b14610087578063d0e30db01461009e575b600080fd5b34801561006857600080fd5b506100716100c0565b6040518082815260200191505060405180910390f35b34801561009357600080fd5b5061009c6100df565b005b6100a6610143565b604051808215151515815260200191505060405180910390f35b60003073ffffffffffffffffffffffffffffffffffffffff1631905090565b3373ffffffffffffffffffffffffffffffffffffffff166108fc6107d03073ffffffffffffffffffffffffffffffffffffffff1631019081150290604051600060405180830381858888f19350505050158015610140573d6000803e3d6000fd5b50565b600060019050905600a165627a7a723058203af50ab840a139cea1f1cdfc17bfd13b0d635533cd093bad92e1428938139f690029");
+
+  //     AccountState SimpleGlobalState::create_with_storage(
+  //   const Address& addr, const uint256_t& balance, const Code& code, const nlohmann::json& j)
+  // {
+  //   insert({SimpleAccount(addr, balance, code), {SimpleStorage(j)}});
+  //   return get(addr);
+  // }
+
+      auto address = pop_addr(ctxt->s);
+      gs.create_with_storage(address, 0xf4240, deployed_code, {});
+      ctxt->s.push(gs.get(address).acc.get_code().size());
+      // ctxt->s.push(deployed_code.size());
+      // >>
+
+      // OLD CODE
+      // ctxt->s.push(gs.get(pop_addr(ctxt->s)).acc.get_code().size());
     }
 
     void extcodecopy()
@@ -1197,14 +1227,15 @@ namespace eevm
     {
       const auto offset = ctxt->s.pop64();
       const auto size = ctxt->s.pop64();
-
+      returnData = copy_from_mem(offset, size);
       // invoke caller's return handler
-      ctxt->rh(copy_from_mem(offset, size));
+      ctxt->rh(returnData);
       pop_context();
     }
 
     void stop()
     {
+      cout << "ENTER STOP" << endl;
       // (1) save halt handler
       auto hh = ctxt->hh;
       // (2) pop current context
@@ -1263,14 +1294,17 @@ namespace eevm
 
     void call()
     {
+      std::cout << "1" << std::endl;
       const auto op = get_op();
       ctxt->s.pop(); // gas limit not used
+      std::cout << "2" << std::endl;
       const auto addr = pop_addr(ctxt->s);
       const auto value = op == DELEGATECALL ? 0 : ctxt->s.pop64();
       const auto offIn = ctxt->s.pop64();
       const auto sizeIn = ctxt->s.pop64();
       const auto offOut = ctxt->s.pop64();
       const auto sizeOut = ctxt->s.pop64();
+      std::cout << "3" << std::endl;
 
       if (addr >= 1 && addr <= 8)
       {
@@ -1279,15 +1313,17 @@ namespace eevm
           ET::notImplemented,
           "Precompiled contracts/native extensions are not implemented.");
       }
+      std::cout << "4" << std::endl;
 
       decltype(auto) callee = gs.get(addr);
       ctxt->acc.pay_to(callee.acc, value);
       if (!callee.acc.has_code())
       {
+        std::cout << "5" << addr << std::endl;
         ctxt->s.push(1);
         return;
       }
-
+      std::cout << "6" << std::endl;
       prepare_mem_access(offOut, sizeOut);
       auto input = copy_from_mem(offIn, sizeIn);
 
@@ -1339,6 +1375,13 @@ namespace eevm
           throw UnexpectedState("Unknown call opcode.");
       }
     }
+
+    // << MYCODE
+    void opReturnDataSize()
+    {
+       ctxt->s.push(returnData.size());
+    }
+    // >>
   };
 
   Processor::Processor(GlobalState& gs) : gs(gs) {}
